@@ -11,3 +11,35 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Dashboard layout and card styles */
+.dashboard {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.dashboard h2 {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin: 0 0 8px 0;
+}
+
+.card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  min-height: 120px;
+}
+
+@media (max-width: 520px) {
+  .dashboard {
+    padding: 10px;
+    gap: 12px;
+  }
+}
