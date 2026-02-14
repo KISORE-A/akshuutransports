@@ -9,7 +9,7 @@ const weatherConditions = [
   { status: "🌫️ Foggy", temp: 18, humidity: 85, wind: 5, delay: 10 },
 ];
 
-export default function WeatherInfo() {
+export default function WeatherInfo({ allowEdit = true }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const weather = weatherConditions[selectedIndex];
 
@@ -26,42 +26,43 @@ export default function WeatherInfo() {
   }, []);
 
   return (
-    <div className="card">
+    <div className="card weather-card">
       <h3>🌦️ Weather Condition</h3>
-      
-      <div style={{ marginBottom: "12px" }}>
-        <label style={{ display: "block", marginBottom: "6px", fontWeight: "bold" }}>
-          Current Weather:
-        </label>
-        <select
-          value={selectedIndex}
-          onChange={handleWeatherChange}
-          style={{ width: "100%", padding: "8px", fontSize: "14px" }}
-        >
-          {weatherConditions.map((w, idx) => (
-            <option key={idx} value={idx}>
-              {w.status}
-            </option>
-          ))}
-        </select>
-      </div>
+
+      {allowEdit && (
+        <div className="form-group">
+          <label>Current Weather:</label>
+          <select
+            value={selectedIndex}
+            onChange={handleWeatherChange}
+          >
+            {weatherConditions.map((w, idx) => (
+              <option key={idx} value={idx}>
+                {w.status}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div style={{ fontSize: "32px", margin: "12px 0", textAlign: "center" }}>
         {weather.status}
       </div>
-      
-      <p>
-        <strong>🌡️ Temperature:</strong> {weather.temp}°C
-      </p>
-      <p>
-        <strong>💧 Humidity:</strong> {weather.humidity}%
-      </p>
-      <p>
-        <strong>💨 Wind Speed:</strong> {weather.wind} km/h
-      </p>
-      <p style={{ color: weather.delay > 5 ? "#d9534f" : "#5cb85c", fontWeight: "bold" }}>
-        <strong>⏱️ Est. Delay:</strong> +{weather.delay} min
-      </p>
+
+      <div style={{ textAlign: "center", marginTop: "1rem" }}>
+        <p>
+          <strong>🌡️ Temperature:</strong> {weather.temp}°C
+        </p>
+        <p>
+          <strong>💧 Humidity:</strong> {weather.humidity}%
+        </p>
+        <p>
+          <strong>💨 Wind Speed:</strong> {weather.wind} km/h
+        </p>
+        <p style={{ color: weather.delay > 5 ? "#d9534f" : "#5cb85c", fontWeight: "bold" }}>
+          <strong>⏱️ Est. Delay:</strong> +{weather.delay} min
+        </p>
+      </div>
     </div>
   );
 }

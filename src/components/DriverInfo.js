@@ -72,18 +72,16 @@ export default function DriverInfo() {
       <h3>👨‍✈️ Driver Details</h3>
 
       {isAdmin && (
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ display: "block", marginBottom: "6px", fontWeight: "bold" }}>
-            Select Driver
-          </label>
-          <div style={{ display: "flex", gap: "8px" }}>
+        <div className="form-group">
+          <label>Select Driver</label>
+          <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
             <select
               value={selectedId}
               onChange={(e) => {
                 setSelectedId(parseInt(e.target.value));
                 setIsEditing(false);
               }}
-              style={{ flex: 1, padding: "8px" }}
+              style={{ flex: 1 }}
             >
               {drivers.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -93,14 +91,7 @@ export default function DriverInfo() {
             </select>
             <button
               onClick={handleAddDriver}
-              style={{
-                padding: "8px 12px",
-                backgroundColor: "#5cb85c",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
+              className="success"
             >
               ➕ Add
             </button>
@@ -110,79 +101,52 @@ export default function DriverInfo() {
 
       {currentDriver ? (
         isEditing ? (
-          <div
-            style={{
-              border: "1px solid #ddd",
-              padding: "12px",
-              borderRadius: "6px",
-              backgroundColor: "#f9f9f9",
-            }}
-          >
+          <div className="edit-box">
             <h4>✏️ Edit Driver</h4>
-            <div style={{ marginBottom: "8px" }}>
+            <div className="form-group">
               <label>Name</label>
               <input
                 type="text"
                 value={editForm.name || ""}
                 onChange={(e) => handleEditChange("name", e.target.value)}
-                style={{ width: "100%", padding: "6px", marginTop: "4px" }}
               />
             </div>
-            <div style={{ marginBottom: "8px" }}>
+            <div className="form-group">
               <label>Phone</label>
               <input
                 type="text"
                 value={editForm.phone || ""}
                 onChange={(e) => handleEditChange("phone", e.target.value)}
-                style={{ width: "100%", padding: "6px", marginTop: "4px" }}
               />
             </div>
-            <div style={{ marginBottom: "8px" }}>
+            <div className="form-group">
               <label>Experience (Years)</label>
               <input
                 type="number"
                 value={editForm.experience || 0}
                 onChange={(e) => handleEditChange("experience", e.target.value)}
-                style={{ width: "100%", padding: "6px", marginTop: "4px" }}
               />
             </div>
-            <div style={{ marginBottom: "12px" }}>
+            <div className="form-group">
               <label>Bus No</label>
               <input
                 type="text"
                 value={editForm.busNo || ""}
                 onChange={(e) => handleEditChange("busNo", e.target.value)}
-                style={{ width: "100%", padding: "6px", marginTop: "4px" }}
               />
             </div>
-            <div style={{ display: "flex", gap: "8px" }}>
+            <div className="form-actions">
               <button
                 onClick={handleSaveEdit}
-                style={{
-                  flex: 1,
-                  padding: "8px",
-                  backgroundColor: "#5cb85c",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
+                className="success"
               >
-                Save
+                ✓ Save
               </button>
               <button
                 onClick={() => setIsEditing(false)}
-                style={{
-                  flex: 1,
-                  padding: "8px",
-                  backgroundColor: "#999",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
+                className="secondary"
               >
-                Cancel
+                ✕ Cancel
               </button>
             </div>
           </div>
@@ -201,32 +165,15 @@ export default function DriverInfo() {
               <strong>Bus No:</strong> {currentDriver.busNo}
             </p>
             {isAdmin && (
-              <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+              <div className="form-actions" style={{ marginTop: "12px" }}>
                 <button
                   onClick={handleStartEdit}
-                  style={{
-                    flex: 1,
-                    padding: "8px",
-                    backgroundColor: "#0275d8",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
                 >
                   ✏️ Edit
                 </button>
                 <button
                   onClick={() => handleDeleteDriver(currentDriver.id)}
-                  style={{
-                    flex: 1,
-                    padding: "8px",
-                    backgroundColor: "#d9534f",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
+                  className="danger"
                 >
                   🗑️ Delete
                 </button>

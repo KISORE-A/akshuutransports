@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { getAttendance, getAllAttendance } from "../services/api";
 
 function lastNDates(n) {
   const dates = [];
@@ -11,200 +12,166 @@ function lastNDates(n) {
 }
 
 export default function AttendanceSummary({ forUser }) {
-  const [attendance, setAttendance] = useState({});
-  const [selected, setSelected] = useState(forUser || "");
-  const [newDate, setNewDate] = useState("");
+  const [attendanceRecords, setAttendanceRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const windowDays = 30;
 
   useEffect(() => {
-    const raw = localStorage.getItem("attendance");
-    const parsed = raw ? JSON.parse(raw) : {};
-    setAttendance(parsed);
-    if (!forUser) {
-      const uid = localStorage.getItem("userId");
-      if (uid) setSelected(uid);
-    }
+    fetchAttendance();
   }, [forUser]);
 
-  // Save to localStorage
-  const saveAttendance = (updated) => {
-    setAttendance(updated);
-    localStorage.setItem("attendance", JSON.stringify(updated));
-  };
-
-  const keys = Object.keys(attendance).sort();
-  const viewUser = selected || (keys[0] || "");
-  const role = localStorage.getItem("role");
-  const isDriver = role === "Driver";
-  const isAdmin = role === "Admin";
-
-  // compute present in window
-  const windowDates = lastNDates(windowDays);
-  const presentDates = (attendance[viewUser] || []).filter((d) =>
-    windowDates.includes(d)
-  );
-  const presentCount = presentDates.length;
-  const absentCount = windowDays - presentCount;
-
-  // Add date
-  const handleAddDate = () => {
-    if (!newDate) {
-      alert("Please select a date");
-      return;
-    }
-    if (!viewUser) {
-      alert("Please select a student");
-      return;
-    }
-
-    const updated = { ...attendance };
-    updated[viewUser] = updated[viewUser] || [];
-    if (!updated[viewUser].includes(newDate)) {
-      updated[viewUser].push(newDate);
-      updated[viewUser].sort();
-      saveAttendance(updated);
-      setNewDate("");
-    } else {
-      alert("Date already marked as present");
+  const fetchAttendance = async () => {
+    setLoading(true);
+    try {
+      let data;
+      if (forUser) {
+        // Student View: Get only their own records
+        const userStr = localStorage.getItem("user");
+        const userId = userStr ? JSON.parse(userStr).id : null;
+        if (userId) {
+          data = await getAttendance(userId);
+        } else {
+          throw new Error("User not found");
+        }
+      } else {
+        // Admin View: Get all records
+        data = await getAllAttendance();
+      }
+      setAttendanceRecords(data || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Remove date
-  const handleRemoveDate = (date) => {
-    const updated = { ...attendance };
-    updated[viewUser] = (updated[viewUser] || []).filter((d) => d !== date);
-    saveAttendance(updated);
+  // Helper to calculate stats
+  const calculateStats = (records) => {
+    const windowDates = lastNDates(windowDays);
+    const uniqueDates = [...new Set(records.map(r => r.date.slice(0, 10)))];
+    const presentDates = uniqueDates.filter(d => windowDates.includes(d));
+
+    const presentCount = presentDates.length;
+    const absentCount = windowDays - presentCount;
+    const percentage = windowDays > 0 ? Math.round((presentCount / windowDays) * 100) : 0;
+
+    return { presentCount, absentCount, percentage, presentDates };
   };
 
-  // Only driver and admin can edit
-  const canEdit = isDriver || isAdmin;
+  // Logic to Group by User for Admin View
+  const groupedRecords = !forUser ? attendanceRecords.reduce((acc, curr) => {
+    const name = curr.student_name || "Unknown";
+    if (!acc[name]) acc[name] = [];
+    acc[name].push(curr);
+    return acc;
+  }, {}) : null;
+
+  if (loading) return <div className="card">Loading attendance...</div>;
+  if (error) return <div className="card error-message">{error}</div>;
+
+  // Student View (Summary + Detail)
+  if (forUser) {
+    const { presentCount, absentCount, percentage, presentDates } = calculateStats(attendanceRecords);
+
+    return (
+      <div className="card attendance-summary-card">
+        <h3>📊 My Attendance Summary</h3>
+
+        <div className="attendance-stats-grid">
+          <div className="stat-box category-present">
+            <div className="stat-number">{presentCount}</div>
+            <div className="stat-label">Present</div>
+          </div>
+          <div className="stat-box category-absent">
+            <div className="stat-number">{absentCount}</div>
+            <div className="stat-label">Absent</div>
+          </div>
+          <div className={`stat-box ${percentage >= 75 ? "good" : percentage >= 50 ? "avg" : "poor"}`}>
+            <div className="stat-number">{percentage}%</div>
+            <div className="stat-label">Rate</div>
+          </div>
+        </div>
+
+        <details style={{ marginTop: "16px", width: "100%" }}>
+          <summary style={{ cursor: "pointer", fontWeight: "600", padding: "8px 0", color: "var(--text-dark)" }}>
+            📅 View History ({presentDates.length} days)
+          </summary>
+          <div style={{
+            marginTop: "8px",
+            maxHeight: "200px",
+            overflowY: "auto",
+            background: "var(--background-light)",
+            padding: "8px",
+            borderRadius: "8px",
+            border: "1px solid var(--border-color)"
+          }}>
+            {presentDates.length === 0 ? (
+              <p style={{ color: "var(--text-light)" }}>No attendance marked yet.</p>
+            ) : (
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {presentDates.map(date => (
+                  <li key={date} style={{
+                    padding: "8px 0",
+                    borderBottom: "1px solid var(--border-color)",
+                    fontSize: "0.9rem",
+                    color: "var(--text-dark)"
+                  }}>
+                    ✅ {date}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </details>
+      </div>
+    );
+  }
+
+  // Admin View (Summary + List of Users)
+  const today = new Date().toISOString().slice(0, 10);
+  const totalStudents = Object.keys(groupedRecords).length;
+  const presentToday = Object.values(groupedRecords).filter(records =>
+    records.some(r => r.date.slice(0, 10) === today)
+  ).length;
+  const absentToday = totalStudents - presentToday;
 
   return (
-    <div className="card">
-      <h3>📊 Attendance Summary</h3>
+    <div className="card attendance-summary-card">
+      <h3>📊 All Student Attendance</h3>
 
-      {!forUser && (
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ display: "block", marginBottom: 6, fontWeight: "bold" }}>
-            Select Student
-          </label>
-          <select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-            style={{ width: "100%", padding: 8 }}
-          >
-            <option value="">-- select --</option>
-            {keys.map((k) => (
-              <option key={k} value={k}>
-                {k}
-              </option>
-            ))}
-          </select>
+      <div className="attendance-stats-grid">
+        <div className="stat-box category-present big-stat">
+          <div className="stat-number">{presentToday}</div>
+          <div className="stat-label">Total Present Today</div>
         </div>
-      )}
+        <div className="stat-box category-absent big-stat">
+          <div className="stat-number">{absentToday}</div>
+          <div className="stat-label">Total Absent Today</div>
+        </div>
+      </div>
 
-      {viewUser ? (
-        <div>
-          <p>
-            <strong>Student:</strong> {viewUser}
-          </p>
-          <p>
-            <strong>Present (last {windowDays} days):</strong> {presentCount}
-          </p>
-          <p>
-            <strong>Absent (last {windowDays} days):</strong> {absentCount}
-          </p>
-
-          {canEdit && (
-            <div
-              style={{
-                border: "1px solid #ddd",
-                padding: "12px",
-                borderRadius: "6px",
-                marginTop: "12px",
-                backgroundColor: "#f9f9f9",
-              }}
-            >
-              <h4>✏️ Edit Attendance</h4>
-              <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
-                <input
-                  type="date"
-                  value={newDate}
-                  onChange={(e) => setNewDate(e.target.value)}
-                  style={{ flex: 1, padding: "6px" }}
-                />
-                <button
-                  onClick={handleAddDate}
-                  style={{
-                    padding: "6px 12px",
-                    backgroundColor: "#5cb85c",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Mark Present
-                </button>
+      <div className="attendance-list">
+        {totalStudents === 0 ? (
+          <p>No records found.</p>
+        ) : (
+          Object.entries(groupedRecords).map(([name, records]) => {
+            const { percentage, presentCount } = calculateStats(records);
+            return (
+              <div key={name} className="attendance-item">
+                <div className="attendance-item-info">
+                  <strong>{name}</strong>
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-light)" }}>{presentCount} Days Present</span>
+                </div>
+                <div className={`attendance-percentage ${percentage >= 75 ? "good" : percentage >= 50 ? "avg" : "poor"}`}>
+                  {percentage}%
+                </div>
               </div>
-            </div>
-          )}
-
-          <details style={{ marginTop: "12px" }}>
-            <summary style={{ cursor: "pointer", fontWeight: "bold" }}>
-              Present Dates ({(attendance[viewUser] || []).length})
-            </summary>
-            <div
-              style={{
-                marginTop: "8px",
-                maxHeight: "200px",
-                overflowY: "auto",
-                backgroundColor: "#f5f5f5",
-                padding: "8px",
-                borderRadius: "4px",
-              }}
-            >
-              {(attendance[viewUser] || []).length === 0 ? (
-                <p style={{ color: "#999" }}>No attendance records</p>
-              ) : (
-                <ul style={{ margin: 0, paddingLeft: "20px" }}>
-                  {(attendance[viewUser] || []).map((d) => (
-                    <li
-                      key={d}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        padding: "4px 0",
-                      }}
-                    >
-                      <span>{d}</span>
-                      {canEdit && (
-                        <button
-                          onClick={() => handleRemoveDate(d)}
-                          style={{
-                            padding: "2px 8px",
-                            backgroundColor: "#d9534f",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "3px",
-                            cursor: "pointer",
-                            fontSize: "12px",
-                          }}
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </details>
-        </div>
-      ) : (
-        <p>No student selected and no attendance data available.</p>
-      )}
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }

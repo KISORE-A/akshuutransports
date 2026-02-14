@@ -1,46 +1,45 @@
 import React, { useState } from "react";
 import QrReader from "react-qr-reader";
+import { markAttendance } from "../services/api";
 
 function AttendanceStudent() {
   const [enteredOtp, setEnteredOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const getStudentId = () => {
+    const userStr = localStorage.getItem("user");
+    return userStr ? JSON.parse(userStr).id : null;
+  };
+
+  const handleAttendance = async (status) => {
+    const studentId = getStudentId();
+    if (!studentId) {
+      alert("User not found locally. Please login again.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await markAttendance(studentId, status);
+      alert(`Attendance marked successfully! (${status}) ✅`);
+    } catch (err) {
+      alert("Error marking attendance: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const submitOTP = () => {
     if (enteredOtp.length !== 6) {
       alert("Enter valid 6-digit OTP ❌");
       return;
     }
-
-    const userId = localStorage.getItem("userId") || "unknown";
-    const key = "attendance";
-    const raw = localStorage.getItem(key);
-    const attendance = raw ? JSON.parse(raw) : {};
-    const today = new Date().toISOString().slice(0, 10);
-
-    attendance[userId] = attendance[userId] || [];
-    if (!attendance[userId].includes(today)) {
-      attendance[userId].push(today);
-    }
-
-    localStorage.setItem(key, JSON.stringify(attendance));
-    alert("OTP Submitted Successfully ✅");
+    handleAttendance(`OTP: ${enteredOtp}`);
   };
 
-  // ✅ CORRECT handler for react-qr-reader
   const handleScan = (data) => {
     if (data) {
-      const userId = localStorage.getItem("userId") || "unknown";
-      const key = "attendance";
-      const raw = localStorage.getItem(key);
-      const attendance = raw ? JSON.parse(raw) : {};
-      const today = new Date().toISOString().slice(0, 10);
-
-      attendance[userId] = attendance[userId] || [];
-      if (!attendance[userId].includes(today)) {
-        attendance[userId].push(today);
-      }
-
-      localStorage.setItem(key, JSON.stringify(attendance));
-      alert("QR Scanned Successfully ✅\nOTP: " + data);
+      handleAttendance(`QR: ${data}`);
     }
   };
 
@@ -49,29 +48,37 @@ function AttendanceStudent() {
   };
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
-      <h2>🎓 Student Attendance</h2>
+    <div className="card attendance-card">
+      <h3>🎓 Student Attendance</h3>
 
-      <h4>📷 Scan QR Code</h4>
-      <QrReader
-        delay={300}
-        onScan={handleScan}
-        onError={handleError}
-        style={{ width: "280px", margin: "auto" }}
-      />
+      <div className="attendance-qr" style={{ marginBottom: 12 }}>
+        <h4 style={{ margin: 0 }}>📷 Scan QR Code</h4>
+        <div style={{ width: "100%", maxWidth: 360 }}>
+          <QrReader
+            delay={300}
+            onScan={handleScan}
+            onError={handleError}
+            style={{ width: "100%" }}
+          />
+        </div>
+      </div>
 
-      <h4>OR Enter OTP</h4>
-      <input
-        type="text"
-        maxLength="6"
-        value={enteredOtp}
-        onChange={(e) =>
-          setEnteredOtp(e.target.value.replace(/\D/g, ""))
-        }
-        placeholder="Enter 6-digit OTP"
-      />
-      <br />
-      <button onClick={submitOTP}>Submit OTP</button>
+      <div className="attendance-otp">
+        <h4>OR Enter OTP</h4>
+        <div className="otp-input-group">
+          <input
+            type="text"
+            maxLength="6"
+            value={enteredOtp}
+            onChange={(e) => setEnteredOtp(e.target.value.replace(/\D/g, ""))}
+            placeholder="6-digit Code"
+            style={{ marginBottom: 0 }}
+          />
+          <button onClick={submitOTP} disabled={loading} style={{ whiteSpace: 'nowrap' }}>
+            {loading ? "..." : "Verify OTP"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

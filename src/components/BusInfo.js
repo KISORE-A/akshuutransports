@@ -39,39 +39,29 @@ export default function BusInfo() {
     <div className="card">
       <h3>🚌 Bus Information</h3>
       {isEditing ? (
-        <div
-          style={{
-            border: "1px solid #ddd",
-            padding: "12px",
-            borderRadius: "6px",
-            backgroundColor: "#f9f9f9",
-          }}
-        >
+        <div className="edit-box">
           <h4>✏️ Edit Bus</h4>
-          <div style={{ marginBottom: "8px" }}>
+          <div className="form-group">
             <label>Bus No</label>
             <input
               type="text"
               value={editForm.busNo || ""}
               onChange={(e) => handleEditChange("busNo", e.target.value)}
-              style={{ width: "100%", padding: "6px", marginTop: "4px" }}
             />
           </div>
-          <div style={{ marginBottom: "8px" }}>
+          <div className="form-group">
             <label>Bus Type</label>
             <input
               type="text"
               value={editForm.type || ""}
               onChange={(e) => handleEditChange("type", e.target.value)}
-              style={{ width: "100%", padding: "6px", marginTop: "4px" }}
             />
           </div>
-          <div style={{ marginBottom: "12px" }}>
+          <div className="form-group">
             <label>Status</label>
             <select
               value={editForm.status || ""}
               onChange={(e) => handleEditChange("status", e.target.value)}
-              style={{ width: "100%", padding: "6px", marginTop: "4px" }}
             >
               <option value="Running">Running</option>
               <option value="Stopped">Stopped</option>
@@ -79,34 +69,18 @@ export default function BusInfo() {
               <option value="Delayed">Delayed</option>
             </select>
           </div>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div className="form-actions">
             <button
               onClick={handleSaveEdit}
-              style={{
-                flex: 1,
-                padding: "8px",
-                backgroundColor: "#5cb85c",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
+              className="success"
             >
-              Save
+              ✓ Save
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              style={{
-                flex: 1,
-                padding: "8px",
-                backgroundColor: "#999",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
+              className="secondary"
             >
-              Cancel
+              ✕ Cancel
             </button>
           </div>
         </div>
@@ -124,16 +98,7 @@ export default function BusInfo() {
           {canEdit && (
             <button
               onClick={handleStartEdit}
-              style={{
-                width: "100%",
-                marginTop: "8px",
-                padding: "8px",
-                backgroundColor: "#0275d8",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
+              style={{ width: "100%", marginTop: "8px" }}
             >
               ✏️ Edit
             </button>

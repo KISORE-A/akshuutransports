@@ -39,71 +39,45 @@ export default function RouteInfo() {
     <div className="card">
       <h3>🛣️ Route & Timing</h3>
       {isEditing ? (
-        <div
-          style={{
-            border: "1px solid #ddd",
-            padding: "12px",
-            borderRadius: "6px",
-            backgroundColor: "#f9f9f9",
-          }}
-        >
+        <div className="edit-box">
           <h4>✏️ Edit Route</h4>
-          <div style={{ marginBottom: "8px" }}>
+          <div className="form-group">
             <label>Route</label>
             <input
               type="text"
               value={editForm.route || ""}
               onChange={(e) => handleEditChange("route", e.target.value)}
-              style={{ width: "100%", padding: "6px", marginTop: "4px" }}
               placeholder="e.g., City → College"
             />
           </div>
-          <div style={{ marginBottom: "8px" }}>
+          <div className="form-group">
             <label>Start Time</label>
             <input
               type="time"
               value={editForm.startTime || ""}
               onChange={(e) => handleEditChange("startTime", e.target.value)}
-              style={{ width: "100%", padding: "6px", marginTop: "4px" }}
             />
           </div>
-          <div style={{ marginBottom: "12px" }}>
+          <div className="form-group">
             <label>ETA (Estimated Time of Arrival)</label>
             <input
               type="time"
               value={editForm.eta || ""}
               onChange={(e) => handleEditChange("eta", e.target.value)}
-              style={{ width: "100%", padding: "6px", marginTop: "4px" }}
             />
           </div>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div className="form-actions">
             <button
               onClick={handleSaveEdit}
-              style={{
-                flex: 1,
-                padding: "8px",
-                backgroundColor: "#5cb85c",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
+              className="success"
             >
-              Save
+              ✓ Save
             </button>
             <button
               onClick={() => setIsEditing(false)}
-              style={{
-                flex: 1,
-                padding: "8px",
-                backgroundColor: "#999",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
+              className="secondary"
             >
-              Cancel
+              ✕ Cancel
             </button>
           </div>
         </div>
@@ -121,16 +95,7 @@ export default function RouteInfo() {
           {canEdit && (
             <button
               onClick={handleStartEdit}
-              style={{
-                width: "100%",
-                marginTop: "8px",
-                padding: "8px",
-                backgroundColor: "#0275d8",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-              }}
+              style={{ width: "100%", marginTop: "8px" }}
             >
               ✏️ Edit
             </button>

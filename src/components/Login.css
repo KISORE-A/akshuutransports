@@ -1,74 +1,92 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
+/* Login.css */
+.error-message {
+  background-color: #fee2e2;
+  color: #c53030;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  border: 1px solid #fecaca;
+  text-align: center;
 }
 
-.login-container {
-  height: 100vh;
+.selected-role-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  background: linear-gradient(to right, #8fbaf3, #cfd9ff);
-  /* background-image: url('../../public/college-bg.jpg'); */
-  background-size: cover;
-  background-position: center;  
-}
-
-.login-box {
-  background: white;
-  padding: 30px;
-  width: 360px;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.title {
-  text-align: center;
-  color: #1d3c72;
-  margin-bottom: 5px;
-}
-
-.subtitle {
-  text-align: center;
-  color: #555;
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-top: 15px;
-  font-weight: bold;
-}
-
-input,
-select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-button {
-  width: 100%;
-  margin-top: 20px;
-  padding: 12px;
-  background: #1d3c72;
-  color: white;
-  font-size: 16px;
-  border: none;
+  margin-bottom: 15px;
+  background: #eef2ff;
+  padding: 10px 15px;
   border-radius: 8px;
+  border: 1px solid #c7d2fe;
+}
+
+.selected-role-header p {
+  margin: 0;
+  color: #3730a3;
+  font-size: 0.95rem;
+}
+
+.change-role-btn {
+  background: transparent;
+  border: none;
+  color: #4f46e5;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  width: auto !important;
+  /* Override button width */
+  box-shadow: none !important;
+}
+
+.change-role-btn:hover {
+  color: #3730a3;
+  background: transparent;
+  transform: none;
+}
+
+.role-select {
+  margin-bottom: 15px;
+  padding: 12px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  font-size: 1rem;
+  transition: all 0.3s ease;
   cursor: pointer;
 }
 
-button:hover {
-  background: #16305d;
+.role-select:focus {
+  border-color: #0d47a1;
+  background-color: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1);
 }
 
-.footer {
-  text-align: center;
+/* Transition Container */
+.login-fields {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-20px);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-fields.visible {
+  max-height: 400px;
+  /* Adjust based on content height */
+  opacity: 1;
+  transform: translateY(0);
   margin-top: 15px;
-  font-size: 13px;
-  color: #777;
+}
+
+/* Enhancements for better look */
+.role-select-group label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  display: block;
 }
