@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { loginUser } from "../services/api";
+
 import "./Login.css";
 
 function Login() {
@@ -10,6 +11,16 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const prefill = location.state?.prefill;
+    if (prefill?.role) {
+      setSelectedRole(prefill.role);
+      setEmail(prefill.email || "");
+      setPassword(prefill.password || "");
+    }
+  }, [location.state]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -108,12 +119,7 @@ function Login() {
           </div>
         </form>
 
-        {selectedRole && (
-          <p className="footer">
-            Default Creds: {selectedRole}@bit.edu <br />
-            Pass: 123456
-          </p>
-        )}
+
         <p className="footer">
           <Link to="/terms-privacy" style={{ color: '#666', textDecoration: 'underline', fontSize: '0.9rem', cursor: 'pointer' }}>Terms & Privacy Policy</Link>
         </p>

@@ -10,6 +10,16 @@ export default function Navigation() {
   const user = userStr ? JSON.parse(userStr) : null;
   const role = user?.role || "guest";
   const name = user?.name || "User";
+  const avatarSrc =
+    role?.toLowerCase() === "admin"
+      ? "/divya.jpeg"
+      : role?.toLowerCase() === "teacher"
+        ? user?.email === "akshayaa@bitsathy.ac.in"
+          ? "/harita.jpeg"
+          : "/mam.png"
+        : role?.toLowerCase() === "driver"
+          ? "/sabbu%20driver.jpeg"
+        : "/kisore.png";
 
   useEffect(() => {
     if (isDarkMode) {
@@ -20,6 +30,17 @@ export default function Navigation() {
       localStorage.setItem("theme", "light");
     }
   }, [isDarkMode]);
+
+  useEffect(() => {
+    const pending = sessionStorage.getItem("scrollToSectionId");
+    if (!pending) return;
+
+    sessionStorage.removeItem("scrollToSectionId");
+    setTimeout(() => {
+      const element = document.getElementById(pending);
+      if (element) element.scrollIntoView({ behavior: "smooth" });
+    }, 50);
+  }, [location.pathname]);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
@@ -48,23 +69,48 @@ export default function Navigation() {
     } else if (path !== location.pathname) {
       // If we are on a different page (e.g. Profile), navigate home first then scroll?
       // For now, if ID exists but element doesn't (different page), just go to path
+      if (id) sessionStorage.setItem("scrollToSectionId", id);
       navigate(path);
       setIsOpen(false);
-      // Optional: Logic to scroll after navigation could be added here
     }
   };
 
   const currentRole = role?.toLowerCase() || "student";
+
+  const leaveSummaryNav =
+    currentRole === "admin"
+      ? { path: "/admin/leaves", id: null }
+      : currentRole === "teacher"
+        ? { path: "/teacher/leaves", id: null }
+        : currentRole === "student"
+          ? { path: "/student/leaves", id: null }
+          : currentRole === "driver"
+            ? { path: "/driver", id: "leave-section" }
+            : { path: `/${currentRole}`, id: "attendance-section" };
 
   const navLinks = [
     { name: "🏠 Home Dashboard", path: `/${currentRole}`, id: "top" },
     { name: "👤 My Profile", path: "/profile", id: null },
     { name: "📍 Live Bus Tracking", path: `/${currentRole}`, id: "map-section" },
     { name: "🚌 Route & Stops", path: `/${currentRole}`, id: "route-section" },
-    { name: "📅 Attendance Records", path: `/${currentRole}`, id: "attendance-section" },
+    { name: "📅 Attendance Records", ...leaveSummaryNav },
     { name: "🔔 All Notifications", path: `/${currentRole}`, id: "notification-section" },
+    { name: "🗣️ Feedback", path: currentRole === "admin" ? "/admin/feedback" : `/${currentRole}`, id: currentRole === "admin" ? null : "feedback-panel" },
     { name: "🆘 Emergency Support", path: `/${currentRole}`, id: "support-section" },
   ];
+  const notificationCount = 8;
+
+  const openNotificationsFromNavbar = () => {
+    window.dispatchEvent(new CustomEvent("akshuu:toggle-notifications"));
+  };
+
+  const openFeedbackFromNavbar = () => {
+    if (currentRole === "admin") {
+      navigate("/admin/feedback");
+      return;
+    }
+    window.dispatchEvent(new CustomEvent("akshuu:toggle-feedback"));
+  };
 
   return (
     <>
@@ -84,8 +130,48 @@ export default function Navigation() {
           </div>
 
           <div className="navbar-user">
+            <button
+              className="navbar-avatar-btn"
+              onClick={() => navigate("/profile")}
+              aria-label="Open profile"
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                border: "2px solid white",
+                padding: 0,
+                overflow: "hidden",
+                background: "white",
+                cursor: "pointer"
+              }}
+            >
+              <img
+                src={avatarSrc}
+                alt={`${name} profile`}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            </button>
             <span className="navbar-role">{role}</span>
             <span className="desktop-only text-white" style={{ marginLeft: '10px' }}>Hello, {name}</span>
+            <button
+              className="navbar-notify-btn"
+              onClick={openNotificationsFromNavbar}
+              aria-label="Open notifications"
+              title="Notifications"
+              style={{ marginLeft: "6px" }}
+            >
+              <span className="navbar-notify-icon">🔔</span>
+              <span className="navbar-notify-badge">{notificationCount}</span>
+            </button>
+            <button
+              className="navbar-notify-btn"
+              onClick={openFeedbackFromNavbar}
+              aria-label="Open feedback"
+              title="Feedback"
+              style={{ marginLeft: "6px" }}
+            >
+              <span className="navbar-notify-icon">💬</span>
+            </button>
             <button className="navbar-logout desktop-only" onClick={handleLogout} style={{ marginLeft: '15px' }}>
               Logout
             </button>
@@ -96,7 +182,9 @@ export default function Navigation() {
       {/* Sidebar Overlay */}
       <div
         className={`sidebar-overlay ${isOpen ? "open" : ""}`}
-        onClick={() => setIsOpen(false)}
+        onClick={() => {
+          setIsOpen(false);
+        }}
         style={{ cursor: 'pointer', display: isOpen ? 'block' : 'none' }}
       ></div>
 
@@ -106,7 +194,9 @@ export default function Navigation() {
           <h2>Akshuu</h2>
           <p>{name} • {role}</p>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+            }}
             style={{
               position: 'absolute',
               top: '1.5rem',
@@ -142,12 +232,19 @@ export default function Navigation() {
           ))}
 
           <div className="sidebar-section">Profile & History</div>
-          {navLinks.slice(3, 7).map((link, idx) => (
+          {navLinks.slice(3, 8).map((link, idx) => (
             <div
               key={idx + 3}
               className="sidebar-link"
               style={{ cursor: 'pointer' }}
-              onClick={() => scrollToSection(link.id, link.path)}
+              onClick={() => {
+                if (link.id === "feedback-panel") {
+                  setIsOpen(false);
+                  openFeedbackFromNavbar();
+                  return;
+                }
+                scrollToSection(link.id, link.path);
+              }}
             >
               {link.name}
             </div>

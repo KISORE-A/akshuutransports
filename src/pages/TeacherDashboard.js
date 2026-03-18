@@ -3,10 +3,10 @@ import BusInfo from "../components/BusInfo";
 import RouteInfo from "../components/RouteInfo";
 import DriverInfo from "../components/DriverInfo";
 import MapSection from "../components/MapSection";
-import WeatherInfo from "../components/WeatherInfo";
 import Notifications from "../components/Notifications";
-import AttendanceSummary from "../components/AttendanceSummary";
-import SupportSection from "../components/SupportSection";
+import MarkStudentAttendance from "../components/MarkStudentAttendance";
+import WeatherInfo from "../components/WeatherInfo";
+import FeedbackPanel from "../components/FeedbackPanel";
 
 export default function TeacherDashboard() {
     return (
@@ -20,25 +20,33 @@ export default function TeacherDashboard() {
                         <DriverInfo />
                     </div>
 
-                    <div id="attendance-section">
-                        <AttendanceSummary />
-                    </div>
-
-                    {/* FULL WIDTH WEATHER SECTION */}
-                    <div className="weather-card">
-                        <WeatherInfo allowEdit={false} />
-                    </div>
-
-                    {/* FULL WIDTH MAP SECTION */}
-                    <div id="map-section" className="map-card"><MapSection /></div>
-
                     <div id="notification-section">
                         <Notifications />
                     </div>
 
-                    <div id="support-section">
-                        <SupportSection />
+                    <div id="attendance-section" style={{ marginTop: "1rem", gridColumn: "1 / -1", width: "100%" }}>
+                        <MarkStudentAttendance />
                     </div>
+
+                    <div style={{ marginTop: "1rem", gridColumn: "1 / -1", width: "100%" }}>
+                        <WeatherInfo allowEdit={false} coloredHeader />
+                    </div>
+
+                    <div className="card teacher-gradient-card" style={{ padding: "1.5rem", marginTop: "1rem", gridColumn: "1 / -1", width: "100%" }}>
+                        <div className="teacher-gradient-header">
+                            <h3 style={{ color: "white", margin: 0, border: "none", padding: 0 }}>📋 Student Leave Approvals</h3>
+                        </div>
+                        <p style={{ color: "#707eae" }}>Approve or reject student leave requests.</p>
+                        <a href="/teacher/leaves" className="primary" style={{ display: "inline-block", padding: "10px 16px", textDecoration: "none" }}>
+                            Open Leave Approvals
+                        </a>
+                    </div>
+
+                    {/* FULL WIDTH MAP SECTION */}
+                    <div id="map-section" className="map-card"><MapSection /></div>
+                    <FeedbackPanel />
+
+
                 </div>
             </div>
         </>

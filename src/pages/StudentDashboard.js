@@ -3,11 +3,11 @@ import BusInfo from "../components/BusInfo";
 import RouteInfo from "../components/RouteInfo";
 import DriverInfo from "../components/DriverInfo";
 import MapSection from "../components/MapSection";
-import WeatherInfo from "../components/WeatherInfo";
 import Notifications from "../components/Notifications";
 import AttendanceStudent from "../components/AttendanceStudent";
-import AttendanceSummary from "../components/AttendanceSummary";
-import SupportSection from "../components/SupportSection";
+import StudentFees from "../components/StudentFees";
+import WeatherInfo from "../components/WeatherInfo";
+import FeedbackPanel from "../components/FeedbackPanel";
 
 export default function StudentDashboard() {
   return (
@@ -21,28 +21,34 @@ export default function StudentDashboard() {
             <DriverInfo />
           </div>
 
-          <AttendanceSummary forUser={true} />
-
-          {/* SEPARATE FULL-WIDTH WEATHER SECTION */}
-          <div className="weather-card">
-            <WeatherInfo allowEdit={false} />
-          </div>
-
-          {/* SEPARATE FULL-WIDTH MAP SECTION */}
-          <div id="map-section" className="map-card">
-            <MapSection />
-          </div>
-
           <div id="notification-section">
             <Notifications />
           </div>
 
-          <div id="attendance-section">
+          <div style={{ marginTop: "1rem", gridColumn: "1 / -1", width: "100%" }}>
+            <StudentFees />
+          </div>
+
+          <div style={{ marginTop: "1rem", gridColumn: "1 / -1", width: "100%" }}>
             <AttendanceStudent />
           </div>
-          <div id="support-section">
-            <SupportSection />
+
+          <div className="card" style={{ padding: "1.5rem", marginTop: "1rem", gridColumn: "1 / -1", width: "100%" }}>
+            <h3 style={{ color: "#2b3674", marginTop: 0 }}>📋 Leave Request</h3>
+            <p style={{ color: "#707eae" }}>Submit your leave to your teacher for approval.</p>
+            <a href="/student/leaves" className="primary" style={{ display: "inline-block", padding: "10px 16px", textDecoration: "none" }}>
+              Open Leave Page
+            </a>
           </div>
+
+          <div style={{ marginTop: "1rem", gridColumn: "1 / -1", width: "100%" }}>
+            <WeatherInfo allowEdit={false} />
+          </div>
+
+          <div id="map-section" className="map-card">
+            <MapSection />
+          </div>
+          <FeedbackPanel />
         </div>
       </div>
     </>

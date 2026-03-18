@@ -77,7 +77,7 @@ export default function AttendanceSummary({ forUser }) {
 
     return (
       <div className="card attendance-summary-card">
-        <h3>📊 My Attendance Summary</h3>
+        <h3>📊 My Work & Leave Summary</h3>
 
         <div className="attendance-stats-grid">
           <div className="stat-box category-present">

@@ -9,6 +9,10 @@ const UserSchema = new mongoose.Schema({
     department: { type: String },
     year: { type: String },
     studentId: { type: String },
+    // Driver-only profile fields
+    licenseNo: { type: String },
+    licenseCardImage: { type: String }, // data URL or hosted URL
+    assignedBusNo: { type: String }, // optional fallback if bus.driverId isn't set
     isTwoFactorEnabled: { type: Boolean, default: false },
 });
 

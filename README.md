@@ -6,6 +6,19 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
+## Backend API (Port 5000)
+
+This repo includes an Express backend in `backend/` that serves routes under `/api` and (by default) listens on port `5000`.
+
+- Start backend (dev): `npm run backend`
+- Start backend (prod-like): `npm run backend:start`
+
+The frontend dev server is configured with a proxy to `http://localhost:5000`, so frontend requests to `/api/...` are forwarded to the backend automatically during `npm start`.
+
+If your API is hosted somewhere else (staging/production), set `REACT_APP_API_URL` to the backend base URL (example: `https://example.com`) before running/building the frontend.
+
+Note: the backend connects to MongoDB on startup (via `backend/.env`). If the MongoDB connection fails, the backend process exits and the frontend will show a connection error.
+
 ### `npm start`
 
 Runs the app in the development mode.\

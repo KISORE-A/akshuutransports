@@ -12,6 +12,7 @@ export default function Notifications() {
     "🚌 Track your bus live on the map",
     "✅ Attendance confirmed for today"
   ]);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -29,14 +30,38 @@ export default function Notifications() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const onToggle = () => setIsOpen((prev) => !prev);
+    window.addEventListener("akshuu:toggle-notifications", onToggle);
+    return () => window.removeEventListener("akshuu:toggle-notifications", onToggle);
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  if (!isOpen) return null;
+
   return (
-    <div className="card notification-card">
-      <h3>🔔 Notifications</h3>
-      <ul>
-        {items.map((item, index) => (
-          <li key={index} className="fade-in">{item}</li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <div className="notification-overlay" onClick={() => setIsOpen(false)} />
+      <aside className="notification-drawer" role="dialog" aria-label="Notifications panel">
+        <div className="notification-drawer-header">
+          <h3>Notifications</h3>
+          <button className="notification-close-btn" onClick={() => setIsOpen(false)} aria-label="Close notifications">
+            X
+          </button>
+        </div>
+        <ul>
+          {items.map((item, index) => (
+            <li key={index} className="fade-in">{item}</li>
+          ))}
+        </ul>
+      </aside>
+    </>
   );
 }

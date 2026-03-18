@@ -1,0 +1,125 @@
+.feedback-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.28);
+  z-index: 2100;
+}
+
+.feedback-drawer {
+  position: fixed;
+  top: 76px;
+  right: 14px;
+  width: min(460px, calc(100vw - 28px));
+  max-height: calc(100vh - 92px);
+  overflow-y: auto;
+  border-radius: 16px;
+  border: 1px solid #dbe7ff;
+  background: #ffffff;
+  box-shadow: 0 20px 60px rgba(2, 6, 23, 0.3);
+  z-index: 2200;
+  padding: 14px 12px 12px 12px;
+}
+
+.feedback-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 4px 4px 10px 4px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.feedback-drawer-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #1f2a5a;
+}
+
+.feedback-close-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.feedback-form {
+  display: grid;
+  gap: 8px;
+}
+
+.feedback-form button {
+  justify-self: center;
+  min-width: 180px;
+}
+
+.feedback-history {
+  margin-top: 12px;
+}
+
+.feedback-history h4 {
+  color: #2b3674;
+  margin: 0 0 8px 0;
+}
+
+.feedback-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.feedback-item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+}
+
+.feedback-status {
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.feedback-status.open { color: #f59e0b; }
+.feedback-status.reviewed { color: #2563eb; }
+.feedback-status.resolved { color: #16a34a; }
+
+.feedback-meta {
+  margin: 4px 0;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.feedback-reply {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #eef4ff;
+}
+
+.feedback-reply-title {
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.feedback-waiting {
+  margin-top: 8px;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .feedback-drawer {
+    top: 68px;
+    right: 8px;
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 78px);
+    border-radius: 14px;
+  }
+}

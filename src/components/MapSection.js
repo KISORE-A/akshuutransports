@@ -1,229 +1,278 @@
-import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker } from "react-leaflet";
+import React, { useEffect, useMemo, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./MapSection.css"; // We will create this for animations
 
-// Fix default Leaflet marker icons
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+const createBusIcon = (color, label) =>
+  L.divIcon({
+    className: "bus-pin",
+    html: `<div class="bus-pin__inner" style="--pin:${color}"><span>${label}</span></div>`,
+    iconSize: [38, 38],
+    iconAnchor: [19, 34],
+    popupAnchor: [0, -30],
+  });
+
+const destinationIcon = L.divIcon({
+  className: "destination-pin",
+  html: `<div class="destination-pin__inner"><span>BIT</span></div>`,
+  iconSize: [42, 42],
+  iconAnchor: [21, 38],
+  popupAnchor: [0, -32],
 });
 
-// Destination Icon (College)
-const destinationIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/1959/1959420.png", // Graduation cap or school
-  iconSize: [35, 35],
-  popupAnchor: [0, -15],
-});
-
-// Realistic Bus Icon
-const createBusIcon = (color) => new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png", // Bus Icon
-  iconSize: [35, 35],
-  iconAnchor: [17, 17],
-  popupAnchor: [0, -15],
-  className: "bus-marker-icon" // Allow CSS rotation if needed
-});
-
-// Default locations
-const defaultLocation = { lat: 11.5427, lng: 77.2663 }; // Sathyamangalam
 const BIT = [11.5196, 77.3408]; // Accurate BIT Coordinates
 
-// Routes
+const interpolate = (start, end, t) => ([
+  start[0] + (end[0] - start[0]) * t,
+  start[1] + (end[1] - start[1]) * t,
+]);
+
+const buildStops = (start, end, names) =>
+  names.map((name, idx) => ({
+    name,
+    position: interpolate(start, end, names.length === 1 ? 0 : idx / (names.length - 1))
+  }));
+
+const sathyToGobiStops = buildStops(
+  BIT,
+  [11.4539, 77.4425],
+  [
+    "Bannari Amman College",
+    "Sathyamangalam Bus Stand",
+    "Pudukadu",
+    "Kodiveri",
+    "Kunjappanai",
+    "Kasipalayam",
+    "Ariyappampalayam",
+    "Ganapathypalayam",
+    "Gobi Arts College (Near)",
+    "Elathur",
+    "Amala School",
+    "Kacherimedu",
+    "Nambiyur",
+    "Savandapur",
+    "Gobi Bus Stand"
+  ]
+);
+
 const busRoutes = [
   {
-    id: 1,
-    name: "Bus No. 12 (Sathy)",
-    color: "#e53e3e", // Red
-    route: [
-      [11.5427, 77.2663],
-      [11.5405, 77.2710],
-      [11.5380, 77.2780],
-      [11.5345, 77.2860],
-      [11.5310, 77.2940],
-      [11.5290, 77.3020],
-      [11.5275, 77.3110],
-      [11.5260, 77.3200],
-      [11.5240, 77.3300],
-      [11.5220, 77.3350],
-      BIT,
-    ],
+    id: 12,
+    name: "Bus 12",
+    routeName: "Sathyamangalam Route",
+    color: "#e53e3e",
+    stops: sathyToGobiStops,
   },
   {
-    id: 2,
-    name: "Bus No. 05 (CBE)",
-    color: "#3182ce", // Blue
-    route: [
-      [11.4500, 77.2500], // Started closer for demo
-      [11.4600, 77.2600],
-      [11.4800, 77.2800],
-      [11.5000, 77.3000],
-      [11.5100, 77.3200],
-      BIT,
-    ],
+    id: 5,
+    name: "Bus 05",
+    routeName: "Coimbatore Route",
+    color: "#3182ce",
+    stops: buildStops(
+      [11.0168, 76.9558],
+      [11.5196, 77.3408],
+      [
+        "Coimbatore",
+        "Gandhipuram",
+        "RS Puram",
+        "Peelamedu",
+        "Singanallur",
+        "Sulur",
+        "Kangeyam",
+        "Avinashi",
+        "Perundurai",
+        "Nambiyur",
+        "Sathyamangalam"
+      ]
+    ),
+  },
+  {
+    id: 8,
+    name: "Bus 08",
+    routeName: "Erode Route",
+    color: "#38a169",
+    stops: buildStops(
+      [11.3410, 77.7172],
+      [11.4539, 77.4425],
+      [
+        "Erode",
+        "Perundurai",
+        "Chithode",
+        "Nasiyanoor",
+        "Kanjikoil",
+        "Nambiyur",
+        "Gobichettipalayam",
+        "Kallipatti",
+        "Kurumandur"
+      ]
+    ),
+  },
+  {
+    id: 15,
+    name: "Bus 15",
+    routeName: "Salem Route",
+    color: "#dd6b20",
+    stops: buildStops(
+      [11.6643, 78.1460],
+      [11.5196, 77.3408],
+      [
+        "Salem",
+        "Seelanaickenpatti",
+        "Omalur",
+        "Tharamangalam",
+        "Sankari",
+        "Bhavani",
+        "Kavindapadi",
+        "Chithode",
+        "Sathyamangalam"
+      ]
+    ),
   },
 ];
 
-export default function MapSection() {
-  const [userLocation, setUserLocation] = useState(null);
-  const [buses, setBuses] = useState([]);
-  const [signals, setSignals] = useState([
-    { id: 1, lat: 11.5300, lng: 77.3000, status: "RED", timer: 30 },
-    { id: 2, lat: 11.5000, lng: 77.3300, status: "GREEN", timer: 45 },
-    { id: 3, lat: 11.4800, lng: 77.2900, status: "RED", timer: 15 },
-  ]);
-
-  // Traffic Signal Logic
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSignals(prev => prev.map(sig => {
-        if (sig.timer > 0) return { ...sig, timer: sig.timer - 1 };
-        // Switch status
-        return {
-          ...sig,
-          status: sig.status === "RED" ? "GREEN" : "RED",
-          timer: sig.status === "RED" ? 60 : 30 // Green lasts 60s, Red 30s
-        };
-      }));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Initialize buses with random starting positions
-  useEffect(() => {
-    const initialBuses = busRoutes.map((bus) => ({
-      ...bus,
-      lat: bus.route[0][0],
-      lng: bus.route[0][1],
-      currentIndex: 0,
-      nextStopIndex: 1,
-      speed: Math.floor(Math.random() * 20) + 40, // Random speed 40-60 km/h
-      status: "Moving",
-      progress: 0, // 0 to 1 between points
-    }));
-    setBuses(initialBuses);
-  }, []);
-
-  // Get User Location
-  useEffect(() => {
-    if (navigator.geolocation) {
-      const id = navigator.geolocation.watchPosition(
-        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => setUserLocation(defaultLocation),
-        { enableHighAccuracy: true }
-      );
-      return () => navigator.geolocation.clearWatch(id);
-    } else {
-      setUserLocation(defaultLocation);
+const getPointAlongPath = (path, t) => {
+  if (!path.length) return BIT;
+  if (path.length === 1) return path[0];
+  const distances = [];
+  let total = 0;
+  for (let i = 0; i < path.length - 1; i += 1) {
+    const dx = path[i + 1][0] - path[i][0];
+    const dy = path[i + 1][1] - path[i][1];
+    const d = Math.sqrt(dx * dx + dy * dy);
+    distances.push(d);
+    total += d;
+  }
+  const target = total * t;
+  let acc = 0;
+  for (let i = 0; i < distances.length; i += 1) {
+    const seg = distances[i];
+    if (acc + seg >= target) {
+      const segT = (target - acc) / (seg || 1);
+      return interpolate(path[i], path[i + 1], segT);
     }
+    acc += seg;
+  }
+  return path[path.length - 1];
+};
+
+const formatBusId = (id) => String(id).padStart(2, "0");
+
+export default function MapSection({ driverLocation = null }) {
+  const [activeRoute, setActiveRoute] = useState("all");
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [busProgress, setBusProgress] = useState(() =>
+    busRoutes.map((b) => ({ id: b.id, progress: Math.random() * 0.6 + 0.1, speed: 0.0005 + Math.random() * 0.0003 }))
+  );
+
+  const routePaths = useMemo(() => {
+    return busRoutes.reduce((acc, r) => {
+      acc[r.id] = r.stops.map((s) => s.position);
+      return acc;
+    }, {});
   }, []);
 
-  // Realistic Simulation Loop
+  // Simulation Loop
   useEffect(() => {
     const interval = setInterval(() => {
-      setBuses((prevBuses) =>
-        prevBuses.map((bus) => {
-          if (bus.status === "Arrived") return bus;
-
-          const currentPoint = bus.route[bus.currentIndex];
-          const nextPoint = bus.route[bus.nextStopIndex];
-
-          if (!nextPoint) {
-            return { ...bus, status: "Arrived", speed: 0 };
-          }
-
-          // Check for nearby RED signals
-          const nearbySignal = signals.find(sig =>
-            sig.status === "RED" &&
-            Math.abs(sig.lat - bus.lat) < 0.002 &&
-            Math.abs(sig.lng - bus.lng) < 0.002
-          );
-
-          if (nearbySignal) {
-            return { ...bus, speed: 0, status: `Stopped at Signal (${nearbySignal.timer}s)` };
-          }
-
-          // Move interpolated progress
-          let newProgress = bus.progress + 0.02; // Speed factor
-
-          if (newProgress >= 1) {
-            // Reached next point
-            const nextIdx = bus.nextStopIndex + 1;
-            if (nextIdx >= bus.route.length) {
-              return { ...bus, lat: nextPoint[0], lng: nextPoint[1], status: "Arrived", speed: 0 };
-            }
-            return {
-              ...bus,
-              currentIndex: bus.nextStopIndex,
-              nextStopIndex: nextIdx,
-              progress: 0,
-              lat: nextPoint[0],
-              lng: nextPoint[1],
-              speed: Math.floor(Math.random() * 10) + 45, // Fluctuating speed
-              status: "Moving"
-            };
-          }
-
-          // Interpolate position
-          const lat = currentPoint[0] + (nextPoint[0] - currentPoint[0]) * newProgress;
-          const lng = currentPoint[1] + (nextPoint[1] - currentPoint[1]) * newProgress;
-
-          return { ...bus, lat, lng, progress: newProgress, status: "Moving", speed: Math.floor(Math.random() * 10) + 40 };
+      setBusProgress((prev) =>
+        prev.map((b) => {
+          const next = b.progress + b.speed;
+          return { ...b, progress: next > 1 ? 0 : next };
         })
       );
-    }, 100); // 100ms update rate
-
+    }, 250);
     return () => clearInterval(interval);
-  }, [signals]); // Add signals dependency to react to changes
+  }, []);
 
-  if (!userLocation || buses.length === 0) return <div className="loading-map">Loading Live Map...</div>;
+  const filteredRoutes = activeRoute === "all"
+    ? busRoutes
+    : busRoutes.filter((r) => r.id === activeRoute);
+
+  const showAllStops = true;
+  const activeBus = activeRoute === "all" ? null : busRoutes.find((b) => b.id === activeRoute);
+  const driverIcon = useMemo(
+    () =>
+      L.divIcon({
+        className: "bus-pin",
+        html: `<div class="bus-pin__inner" style="--pin:#4318FF"><span>ME</span></div>`,
+        iconSize: [38, 38],
+        iconAnchor: [19, 34],
+        popupAnchor: [0, -30],
+      }),
+    []
+  );
 
   return (
     <div className="card map-card">
-      <div className="map-header">
-        <h3>📍 Live Fleet Tracking</h3>
-        <div className="live-indicator">
-          <span className="pulse-dot"></span> LIVE
-        </div>
+      <div className="route-selector">
+        <button
+          className={`route-chip route-chip-all ${activeRoute === "all" ? "active" : ""}`}
+          onClick={() => {
+            setActiveRoute("all");
+            setIsPanelOpen(false);
+          }}
+        >
+          <span className="chip-title">All Buses</span>
+        </button>
+        {busRoutes.map((r) => {
+          const eta = Math.max(6, Math.round((1 - (busProgress.find((b) => b.id === r.id)?.progress || 0)) * 20));
+          return (
+            <button
+              key={r.id}
+              className={`route-chip ${activeRoute === r.id ? "active" : ""}`}
+              onClick={() => {
+                setActiveRoute(r.id);
+                setIsPanelOpen(true);
+              }}
+            >
+              <div className="chip-left">
+                <span className="chip-dot" style={{ background: r.color }}></span>
+                <div>
+                  <div className="chip-title">{r.name}</div>
+                  <div className="chip-sub">{r.routeName}</div>
+                </div>
+              </div>
+              <div className="chip-right">
+                <span className="chip-badge">EN ROUTE</span>
+                <span className="chip-eta">ETA: {eta} min</span>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="map-container-wrapper">
+      <div className={`map-layout ${isPanelOpen ? "panel-open" : "panel-closed"}`}>
+        <div className="map-container-wrapper">
         <MapContainer
-          center={[userLocation.lat, userLocation.lng]}
-          zoom={12}
-          scrollWheelZoom={false}
+          center={BIT}
+          zoom={10}
+          scrollWheelZoom
+          dragging
+          touchZoom
+          doubleClickZoom
+          boxZoom
+          keyboard
+          tap={false}
           style={{ height: "100%", width: "100%" }}
         >
           <TileLayer
-            url="https://mt1.google.com/vt/lyrs=m,traffic&x={x}&y={y}&z={z}"
-            attribution="&copy; Google Maps"
-          />
-
-          {/* User Location Pulse */}
-          <CircleMarker
-            center={[userLocation.lat, userLocation.lng]}
-            radius={8}
-            pathOptions={{ color: 'white', fillColor: '#4299e1', fillOpacity: 1 }}
-          >
-            <Popup>You are here</Popup>
-          </CircleMarker>
-          <CircleMarker
-            center={[userLocation.lat, userLocation.lng]}
-            radius={20}
-            pathOptions={{ color: '#4299e1', fillColor: '#4299e1', fillOpacity: 0.2, stroke: false }}
-            className="pulse-circle"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="&copy; OpenStreetMap contributors"
           />
 
           {/* Bus Routes */}
-          {busRoutes.map((bus) => (
-            <Polyline
-              key={`route-${bus.id}`}
-              positions={bus.route}
-              pathOptions={{ color: bus.color, weight: 4, opacity: 0.6, dashArray: '10, 10' }}
-            />
+          {filteredRoutes.map((bus) => (
+            <React.Fragment key={`route-${bus.id}`}>
+              <Polyline
+                positions={routePaths[bus.id]}
+                pathOptions={{ color: "#ffffff", weight: 8, opacity: 0.9 }}
+              />
+              <Polyline
+                positions={routePaths[bus.id]}
+                pathOptions={{ color: bus.color, weight: 5, opacity: 0.9 }}
+              />
+            </React.Fragment>
           ))}
 
           {/* Destination */}
@@ -234,48 +283,122 @@ export default function MapSection() {
             </Popup>
           </Marker>
 
-          {/* Traffic Signals */}
-          {signals.map(sig => (
-            <CircleMarker
-              key={`sig-${sig.id}`}
-              center={[sig.lat, sig.lng]}
-              radius={10}
-              pathOptions={{
-                color: 'white',
-                fillColor: sig.status === 'RED' ? '#e53e3e' : '#48bb78',
-                fillOpacity: 1,
-                weight: 2
-              }}
-            >
-              <Popup>
-                <strong>🚦 Traffic Signal</strong><br />
-                Status: {sig.status}<br />
-                Change in: {sig.timer}s
-              </Popup>
-            </CircleMarker>
-          ))}
-
-          {/* Moving Buses */}
-          {buses.map((bus) => (
+          {/* Driver (current device) */}
+          {driverLocation?.lat != null && driverLocation?.lng != null && (
             <Marker
-              key={bus.id}
-              position={[bus.lat, bus.lng]}
-              icon={createBusIcon(bus.color)}
+              position={[driverLocation.lat, driverLocation.lng]}
+              icon={driverIcon}
             >
               <Popup className="bus-popup">
-                <div className="popup-header" style={{ background: bus.color }}>
-                  {bus.name}
+                <div className="popup-header" style={{ background: "#4318FF" }}>
+                  Your Location
                 </div>
                 <div className="popup-body">
-                  <p><strong>Status:</strong> <span className={bus.status === "Moving" ? "status-moving" : "status-stopped"}>{bus.status}</span></p>
-                  <p><strong>Speed:</strong> {bus.speed} km/h</p>
-                  <p><strong>Next Stop:</strong> BIT Campus</p>
-                  <p><strong>ETA:</strong> {Math.floor((1 - bus.progress) * 15 + 2)} mins</p>
+                  <p style={{ margin: 0 }}>
+                    <strong>Lat:</strong> {Number(driverLocation.lat).toFixed(5)}
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    <strong>Lng:</strong> {Number(driverLocation.lng).toFixed(5)}
+                  </p>
                 </div>
               </Popup>
             </Marker>
-          ))}
+          )}
+
+          {/* Moving Buses */}
+          {filteredRoutes.map((bus) => {
+            const progress = busProgress.find((b) => b.id === bus.id)?.progress || 0;
+            const pos = getPointAlongPath(routePaths[bus.id], progress);
+            const nextStop = bus.stops[Math.min(bus.stops.length - 1, Math.floor(progress * bus.stops.length))];
+            return (
+              <Marker
+                key={bus.id}
+                position={pos}
+                icon={createBusIcon(bus.color, formatBusId(bus.id))}
+              >
+                <Popup className="bus-popup">
+                  <div className="popup-header" style={{ background: bus.color }}>
+                    {bus.name}
+                  </div>
+                  <div className="popup-body">
+                    <p><strong>Status:</strong> <span className="status-moving">En Route</span></p>
+                    <p><strong>Route:</strong> {bus.routeName}</p>
+                    <p><strong>Next Stop:</strong> {nextStop?.name}</p>
+                    <p><strong>ETA:</strong> {Math.max(6, Math.round((1 - progress) * 20))} mins</p>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+
+          {/* Stops */}
+          {filteredRoutes.flatMap((bus) => {
+            const stopsToRender = showAllStops
+              ? bus.stops
+              : [bus.stops[0], bus.stops[bus.stops.length - 1]].filter(Boolean);
+            return stopsToRender.map((stop, idx) => (
+              <CircleMarker
+                key={`${bus.id}-stop-${idx}`}
+                center={stop.position}
+                radius={showAllStops ? 6 : 5}
+                pathOptions={{ color: bus.color, fillColor: "white", fillOpacity: 1, weight: 3 }}
+              >
+                <Tooltip direction="top" offset={[0, -8]} opacity={1}>
+                  {stop.name}
+                </Tooltip>
+              </CircleMarker>
+            ));
+          })}
         </MapContainer>
+      </div>
+
+        <aside
+          className={`route-panel ${isPanelOpen ? "open" : ""}`}
+          style={activeBus ? { "--route": activeBus.color } : undefined}
+        >
+          {activeBus ? (
+            <div className="route-panel-inner">
+              <div className="route-panel-header">
+                <div className="route-panel-title">
+                  <span className="route-panel-dot" style={{ background: activeBus.color }}></span>
+                  <div>
+                    <div className="route-panel-name">{activeBus.name}</div>
+                    <div className="route-panel-sub">{activeBus.routeName}</div>
+                  </div>
+                </div>
+                <button className="route-panel-close" onClick={() => setIsPanelOpen(false)}>×</button>
+              </div>
+              <div className="route-panel-status">
+                <span className="chip-badge">EN ROUTE</span>
+                <span className="chip-eta">ETA: {Math.max(6, Math.round((1 - (busProgress.find((b) => b.id === activeBus.id)?.progress || 0)) * 20))} min</span>
+              </div>
+              <div className="route-panel-meta">
+                <span className="route-panel-pill">Total Stops: {activeBus.stops.length}</span>
+                <span className="route-panel-pill">Live Tracking</span>
+              </div>
+              <div className="route-panel-stops">
+                {activeBus.stops.map((stop, idx) => (
+                  <div className="route-stop" key={`${activeBus.id}-panel-stop-${idx}`}>
+                    <div className="route-stop-line">
+                      <span className={`route-stop-dot ${idx === 0 ? "start" : idx === activeBus.stops.length - 1 ? "end" : ""}`}></span>
+                      {idx < activeBus.stops.length - 1 && <span className="route-stop-bar"></span>}
+                    </div>
+                    <div className="route-stop-name">
+                      <span className="route-stop-title">{stop.name}</span>
+                      {idx === 0 && <span className="route-stop-tag">Start</span>}
+                      {idx === activeBus.stops.length - 1 && <span className="route-stop-tag end">End</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="route-panel-inner route-panel-empty">
+              <div className="route-panel-empty-title">Select a bus route</div>
+              <div className="route-panel-empty-sub">Tap a bus chip to view the full list of stops.</div>
+            </div>
+          )}
+        </aside>
       </div>
     </div>
   );

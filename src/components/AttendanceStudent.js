@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import QrReader from "react-qr-reader";
-import { markAttendance } from "../services/api";
+import { verifyAttendanceOtp } from "../services/api";
 
 function AttendanceStudent() {
   const [enteredOtp, setEnteredOtp] = useState("");
@@ -11,19 +11,13 @@ function AttendanceStudent() {
     return userStr ? JSON.parse(userStr).id : null;
   };
 
-  const handleAttendance = async (status) => {
-    const studentId = getStudentId();
-    if (!studentId) {
-      alert("User not found locally. Please login again.");
-      return;
-    }
-
+  const handleAttendance = async (code) => {
     setLoading(true);
     try {
-      await markAttendance(studentId, status);
-      alert(`Attendance marked successfully! (${status}) ✅`);
+      await verifyAttendanceOtp(code);
+      alert("Attendance marked successfully! ✅");
     } catch (err) {
-      alert("Error marking attendance: " + err.message);
+      alert("OTP verification failed: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -34,12 +28,12 @@ function AttendanceStudent() {
       alert("Enter valid 6-digit OTP ❌");
       return;
     }
-    handleAttendance(`OTP: ${enteredOtp}`);
+    handleAttendance(enteredOtp);
   };
 
   const handleScan = (data) => {
     if (data) {
-      handleAttendance(`QR: ${data}`);
+      handleAttendance(String(data).trim());
     }
   };
 

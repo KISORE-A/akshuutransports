@@ -1,0 +1,88 @@
+.admin-card {
+    padding: 1.6rem;
+}
+
+.quick-title {
+    margin: 0 0 6px 0;
+    color: #2b3674;
+    font-size: 1.2rem;
+}
+
+.quick-sub {
+    margin: 0 0 18px 0;
+    color: #707eae;
+    font-size: 0.85rem;
+}
+
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.quick-card {
+    text-decoration: none;
+    background: #ffffff;
+    border: 1px solid #eef2fb;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 18px rgba(12, 20, 66, 0.08);
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.quick-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: #4318FF;
+}
+
+.quick-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(12, 20, 66, 0.12);
+}
+
+.quick-icon {
+    font-size: 1.6rem;
+}
+
+.quick-name {
+    color: #1f2a5a;
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+
+.quick-desc {
+    color: #7b86b6;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.quick-student::before { background: #5b3bff; }
+.quick-teacher::before { background: #f97316; }
+.quick-driver::before { background: #ef4444; }
+.quick-bus::before { background: #10b981; }
+.quick-fee::before { background: #8b5cf6; }
+.quick-attendance::before { background: #06b6d4; }
+
+@media (max-width: 1100px) {
+    .quick-grid {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .quick-grid {
+        grid-template-columns: 1fr;
+    }
+}

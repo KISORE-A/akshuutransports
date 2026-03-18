@@ -17,21 +17,30 @@
 }
 
 body.dark-mode {
-  --background-light: #1a1c23;
-  --white: #1a1c23;
+  --background-light: #000000;
+  /* Pure Black */
+  --white: #020617;
+  /* Very Deep Royal/Black for cards */
   /* Matching Background */
-  --text-dark: #f8fafc;
-  --text-light: #94a3b8;
+  --text-dark: #eff6ff;
+  /* Crisp White with tiny blue tint */
+  --text-light: #93c5fd;
+  /* Soft Blue text */
   --shadow-sm: none;
   --shadow-md: none;
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
-  --primary-color: #63b3ed;
-  --secondary-color: #4299e1;
-  --border-color: rgba(255, 255, 255, 0.12);
-  --card-bg: #1a1c23;
+  --shadow-lg: 0 0 20px rgba(37, 99, 235, 0.25);
+  /* Royal Blue Glow */
+  --primary-color: #2563eb;
+  /* Vibrant standard Royal Blue */
+  --secondary-color: #1e40af;
+  /* Deep Royal Blue */
+  --border-color: #1e3a8a;
+  /* Royal Blue Border */
+  --card-bg: #020617;
+  /* Deepest Night Blue */
   /* Matching Background */
-  --navbar-bg: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-  --status-bg: rgba(255, 255, 255, 0.05);
+  --navbar-bg: linear-gradient(135deg, #000000 0%, #1e3a8a 100%);
+  --status-bg: rgba(37, 99, 235, 0.15);
   /* Darker subtle background for dark mode */
 }
 
@@ -46,7 +55,21 @@ body.dark-mode {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  width: 100%;
+  max-width: 100%;
+  overscroll-behavior-x: none;
 }
 
 body {
@@ -54,6 +77,19 @@ body {
   background-color: var(--background-light);
   color: var(--text-dark);
   line-height: 1.6;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  min-height: 100vh;
+  overscroll-behavior-x: none;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
 }
 
 /* Typography */
@@ -96,7 +132,7 @@ button {
   font-size: 1rem;
   font-weight: 600;
   border-radius: 0.375rem;
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   box-shadow: var(--shadow-sm);
 }
 
@@ -172,9 +208,9 @@ select:focus {
 
 .login-box {
   background: var(--white);
-  padding: 1.5rem;
+  padding: 2.5rem;
   border-radius: 1rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 450px;
   text-align: center;
@@ -182,12 +218,14 @@ select:focus {
 
 .login-box .title {
   color: var(--primary-color);
+  font-size: 2rem;
+  font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
 .login-box .subtitle {
   color: var(--text-light);
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -208,6 +246,17 @@ select:focus {
   width: 100%;
   margin-top: 1rem;
   padding: 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-box button[type="submit"]:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
 }
 
 .login-box .footer {
@@ -220,11 +269,15 @@ select:focus {
 .navbar {
   background: var(--navbar-bg);
   color: var(--white);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   padding: 0.75rem 0;
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 900;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 2000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .navbar-container {
@@ -256,7 +309,7 @@ select:focus {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, background-color 0.2s ease;
   position: relative;
   z-index: 10;
   pointer-events: auto !important;
@@ -288,6 +341,48 @@ select:focus {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.navbar-notify-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: none;
+}
+
+.navbar-notify-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: none;
+}
+
+.navbar-notify-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.navbar-notify-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  padding: 0 4px;
 }
 
 .navbar-role {
@@ -322,6 +417,38 @@ select:focus {
   color: white !important;
 }
 
+.sidebar-notification-preview {
+  margin: 12px 0 2px 0;
+  border: 1px solid rgba(13, 71, 161, 0.12);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.sidebar-preview-title {
+  font-size: 0.82rem;
+  color: #2b3674;
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.sidebar-preview-item {
+  font-size: 0.88rem;
+  color: #4a5568;
+  background: #eef4ff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 7px;
+  line-height: 1.35;
+  border-left: 3px solid #3b71fe;
+}
+
+.sidebar-preview-item:last-child {
+  margin-bottom: 0;
+}
+
 @media (max-width: 768px) {
   .desktop-only {
     display: none !important;
@@ -337,10 +464,10 @@ select:focus {
   height: 100%;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
-  z-index: 999;
+  z-index: 2500;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .sidebar-overlay.open {
@@ -351,19 +478,20 @@ select:focus {
 .sidebar {
   position: fixed;
   top: 0;
-  left: -300px;
+  left: 0;
   width: 280px;
   height: 100%;
   background: var(--card-bg);
   box-shadow: var(--shadow-lg);
-  z-index: 1000;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 3000;
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
 }
 
 .sidebar.open {
-  left: 0;
+  transform: translateX(0);
 }
 
 .sidebar-header {
@@ -408,7 +536,7 @@ select:focus {
   color: var(--text-dark);
   text-decoration: none;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: background-color 0.2s ease, color 0.2s ease;
   border-left: 4px solid transparent;
 }
 
@@ -441,16 +569,27 @@ select:focus {
 }
 
 /* Dashboard Layout */
-.dashboard-wrapper {
+.dashboard-wrapper,
+.profile-page-wrapper {
+  width: 100%;
   max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
+  margin: 0 auto;
+  padding: calc(130px + env(safe-area-inset-top, 0px)) 1.5rem 80px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+[id] {
+  scroll-margin-top: 130px;
+  padding-top: 20px;
 }
 
 .dashboard {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 1.5rem;
+  width: 100%;
 }
 
 /* Cards */
@@ -460,12 +599,18 @@ select:focus {
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: var(--shadow-md);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border-color);
   height: 100%;
   display: flex;
   flex-direction: column;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 .card ul {
@@ -478,14 +623,16 @@ select:focus {
 
 .card:hover {
   box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
 }
 
 .dashboard>#profile-section,
 .dashboard>#attendance-section,
 .dashboard>#notification-section,
+.dashboard>#announcement-section,
 .dashboard>#support-section,
+.dashboard>#leave-section,
 .dashboard>.map-card,
+.dashboard>.fleet-tracker,
 .dashboard>.weather-card,
 .dashboard>.admin-card,
 .dashboard>.notification-card,
@@ -513,7 +660,8 @@ select:focus {
   justify-content: center;
   gap: 0.75rem;
   font-weight: 500;
-  transition: transform 0.2s;
+  /* Ensure text color inherits correctly */
+  transition: transform 0.2s ease;
 }
 
 .notification-card li:hover {
@@ -527,7 +675,7 @@ select:focus {
 
 .card h3 {
   font-size: 1.25rem;
-  color: var(--text-dark);
+  color: var(--primary-color);
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 0.75rem;
   margin-bottom: 1.25rem;
@@ -535,6 +683,7 @@ select:focus {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  letter-spacing: 0.5px;
 }
 
 /* Status Badges */
@@ -577,7 +726,7 @@ select:focus {
   padding: 1rem 1.5rem;
   background-color: var(--card-bg);
   border-radius: 0.75rem;
-  transition: all 0.2s;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   color: var(--text-dark);
@@ -586,6 +735,8 @@ select:focus {
 .admin-item-info {
   text-align: left;
 }
+
+
 
 .admin-item-actions {
   display: flex;
@@ -683,9 +834,8 @@ table tr:last-child td {
 .dashboard-row {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  align-items: stretch;
 }
 
 .dashboard-tri-row {
@@ -693,20 +843,92 @@ table tr:last-child td {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
-  align-items: stretch;
 }
 
-@media (max-width: 1100px) {
-  .dashboard-tri-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 800px) {
-
+@media (max-width: 900px) {
   .dashboard-row,
   .dashboard-tri-row {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Driver dashboard action cards (Damage / Vehicle / Live Tracking) */
+.driver-action-cards .driver-action-card {
+  min-height: 360px;
+}
+
+.driver-action-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.driver-action-card__body {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.driver-action-card__body--left {
+  align-items: stretch;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.driver-action-card__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.driver-action-cards .driver-action-card button.primary,
+.driver-action-cards .driver-action-card button.secondary,
+.driver-action-cards .driver-action-card button.danger {
+  min-width: 190px;
+}
+
+.driver-action-card__meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.driver-action-card__coords {
+  margin: 2px 0 0 0;
+  color: #707eae;
+  font-size: 0.9rem;
+}
+
+.driver-action-card__error {
+  margin: 2px 0 0 0;
+  color: #e53e3e;
+  font-weight: 700;
+}
+
+.driver-action-card__footer {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .driver-action-cards .driver-action-card {
+    min-height: auto;
+  }
+
+  .driver-action-cards .driver-action-card button.primary,
+  .driver-action-cards .driver-action-card button.secondary,
+  .driver-action-cards .driver-action-card button.danger {
+    min-width: 160px;
   }
 }
 
@@ -733,19 +955,24 @@ table tr:last-child td {
 .attendance-stats-grid {
   display: flex !important;
   justify-content: center !important;
-  gap: 2rem !important;
+  gap: 1rem !important;
   margin: 20px 0 !important;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .stat-box {
-  padding: 15px !important;
+  padding: 12px 10px !important;
   border-radius: 12px !important;
-  min-width: 140px !important;
+  min-width: 120px !important;
+  flex: 1 1 120px;
+  max-width: 200px;
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
-  transition: all 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
 .stat-box:hover {
@@ -798,7 +1025,7 @@ table tr:last-child td {
   margin-bottom: 12px;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
-  transition: all 0.2s;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .route-info-card p,
@@ -845,6 +1072,21 @@ table tr:last-child td {
 
 .dashboard-row>.attendance-summary-card {
   grid-column: span 1 !important;
+}
+
+.teacher-gradient-card {
+  border: 1px solid #764ba2;
+  overflow: hidden;
+}
+
+.teacher-gradient-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -1.5rem -1.5rem 1rem -1.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem 1rem 0 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 /* ================= MOBILE RESPONSIVENESS ================= */
@@ -895,9 +1137,10 @@ table tr:last-child td {
   }
 
   /* Dashboard Layout Mobile */
-  .dashboard-wrapper {
-    margin: 1rem auto;
-    padding: 0 1rem;
+  .dashboard-wrapper,
+  .profile-page-wrapper {
+    margin: 0 auto;
+    padding: 115px 1rem 60px;
   }
 
   .dashboard {
@@ -966,7 +1209,36 @@ table tr:last-child td {
     padding: 1.5rem;
   }
 
-  .login-box .title {
-    font-size: 1.5rem;
+  .attendance-stats-grid {
+    gap: 0.5rem !important;
   }
+
+  .stat-box {
+    min-width: 100px !important;
+    padding: 10px 5px !important;
+  }
+
+  .stat-number {
+    font-size: 1.25rem !important;
+  }
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.table-responsive table {
+  min-width: 500px; /* Force scroll on small screens instead of squishing */
+}
+
+/* Force prevent horizontal scroll on the main layout */
+.dashboard-wrapper {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  display: block;
 }

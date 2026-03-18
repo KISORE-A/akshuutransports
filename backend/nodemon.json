@@ -1,0 +1,13 @@
+{
+  "watch": ["server.js", "models", "db.js"],
+  "ignore": [
+    "*.log",
+    "server.out.log",
+    "server.err.log",
+    "analytics.json",
+    "*.db",
+    "transport.db",
+    "node_modules"
+  ]
+}
+

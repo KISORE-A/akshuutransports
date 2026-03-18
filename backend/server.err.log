@@ -1,0 +1,39 @@
+(node:3876) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3876) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+PayloadTooLargeError: request entity too large
+    at readStream (D:\akshuutransports\backend\node_modules\raw-body\index.js:163:17)
+    at getRawBody (D:\akshuutransports\backend\node_modules\raw-body\index.js:116:12)
+    at read (D:\akshuutransports\backend\node_modules\body-parser\lib\read.js:79:3)
+    at jsonParser (D:\akshuutransports\backend\node_modules\body-parser\lib\types\json.js:138:5)
+    at Layer.handle [as handle_request] (D:\akshuutransports\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\akshuutransports\backend\node_modules\express\lib\router\index.js:328:13)
+    at D:\akshuutransports\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\akshuutransports\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\akshuutransports\backend\node_modules\express\lib\router\index.js:280:10)
+    at cors (D:\akshuutransports\backend\node_modules\cors\lib\index.js:188:7)
+PayloadTooLargeError: request entity too large
+    at readStream (D:\akshuutransports\backend\node_modules\raw-body\index.js:163:17)
+    at getRawBody (D:\akshuutransports\backend\node_modules\raw-body\index.js:116:12)
+    at read (D:\akshuutransports\backend\node_modules\body-parser\lib\read.js:79:3)
+    at jsonParser (D:\akshuutransports\backend\node_modules\body-parser\lib\types\json.js:138:5)
+    at Layer.handle [as handle_request] (D:\akshuutransports\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\akshuutransports\backend\node_modules\express\lib\router\index.js:328:13)
+    at D:\akshuutransports\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\akshuutransports\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\akshuutransports\backend\node_modules\express\lib\router\index.js:280:10)
+    at cors (D:\akshuutransports\backend\node_modules\cors\lib\index.js:188:7)
+PayloadTooLargeError: request entity too large
+    at readStream (D:\akshuutransports\backend\node_modules\raw-body\index.js:163:17)
+    at getRawBody (D:\akshuutransports\backend\node_modules\raw-body\index.js:116:12)
+    at read (D:\akshuutransports\backend\node_modules\body-parser\lib\read.js:79:3)
+    at jsonParser (D:\akshuutransports\backend\node_modules\body-parser\lib\types\json.js:138:5)
+    at Layer.handle [as handle_request] (D:\akshuutransports\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (D:\akshuutransports\backend\node_modules\express\lib\router\index.js:328:13)
+    at D:\akshuutransports\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (D:\akshuutransports\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (D:\akshuutransports\backend\node_modules\express\lib\router\index.js:280:10)
+    at cors (D:\akshuutransports\backend\node_modules\cors\lib\index.js:188:7)
+(node:6072) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6072) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
